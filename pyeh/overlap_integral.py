@@ -67,8 +67,8 @@ def overlap_integral(orbital_type1, orbital_type2, coordinates_atom1, coordinate
             fxyz += f(2*j, orbital1[i], orbital2[i], a, b)*double_factorial(2*j-1)/((2**j)*(a1+a2)**j)
         F *= fxyz
 
-    S = exponential*F
+    overlap = exponential*F
 
-    return S
+    return overlap
 
 

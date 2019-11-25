@@ -1,6 +1,5 @@
 import numpy as np
-import tools
-
+from pyeh import tools
 
 eV_to_Ha = 3.67493095E-2
 
@@ -10,9 +9,9 @@ def build_output(parsed_data, filename):
 
     structure = np.array(parsed_data.get_coordinates())  # ['structure']
     symbols = parsed_data.get_symbols()
-    # alpha_mo_coeff = parsed_data.get_eigenvectors()  # ['coefficients']['alpha']
-    alpha_mo_coeff = parsed_data.get_mo_coefficients()
-    alpha_mo_energies = np.real(parsed_data.get_eigenvalues())  # ['mo_energies']['alpha']
+    alpha_mo_coeff = parsed_data.get_eigenvectors()  # ['coefficients']['alpha']
+    # alpha_mo_coeff = parsed_data.get_mo_coefficients()
+    alpha_mo_energies = np.real(parsed_data.get_mo_energies())  # ['mo_energies']['alpha']
     ao_labels = parsed_data.get_ao_labels()
     overlap = parsed_data.get_overlap_matrix()
     hamiltonian = parsed_data.get_hamiltonian_matrix()
@@ -82,58 +81,58 @@ def build_output(parsed_data, filename):
     output.write('Total Energy = {:18.8f}\n'.format(parsed_data.get_total_energy()/eV_to_Ha))
     output.write('\n')
 
-    ## La llargada dels mo no es la mateixa que el solapament i l'hamiltonià
-    # output.write('Overlap matrix: \n')
-    # for i in range(int(len(alpha_mo_energies)/5) + (len(alpha_mo_energies)%5 > 0)):
-    #
-    #     n_orbitals = list(range(5*i, 5*i + 5))
-    #     if i == int(len(alpha_mo_energies)/5):
-    #         if len(alpha_mo_energies)%5 > 0:
-    #             n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
-    #
-    #     n = 18
-    #     for orbital in n_orbitals:
-    #         output.write('{:{width}}'.format(orbital + 1, width=n))
-    #         n = 18
-    #     output.write('\n')
-    #     output.write('\n')
-    #
-    #     for j in range(len(alpha_mo_coeff[i])):
-    #         output.write('{:3}'.format(j+1))
-    #         n = 21
-    #         for orbital in n_orbitals:
-    #             output.write('{:{width}.8f}'.format(
-    #                 overlap[orbital][j], width=n))
-    #             n = 18
-    #         output.write('\n')
-    #
-    # output.write('\n')
-    #
-    # output.write('Hamiltonian matrix: \n')
-    # for i in range(int(len(alpha_mo_energies)/5) + (len(alpha_mo_energies)%5 > 0)):
-    #
-    #     n_orbitals = list(range(5*i, 5*i + 5))
-    #     if i == int(len(alpha_mo_energies)/5):
-    #         if len(alpha_mo_energies)%5 > 0:
-    #             n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
-    #
-    #     n = 18
-    #     for orbital in n_orbitals:
-    #         output.write('{:{width}}'.format(orbital + 1, width=n))
-    #         n = 18
-    #     output.write('\n')
-    #     output.write('\n')
-    #
-    #     for j in range(len(alpha_mo_coeff[i])):
-    #         output.write('{:3}'.format(j+1))
-    #         n = 21
-    #         for orbital in n_orbitals:
-    #             output.write('{:{width}.8f}'.format(
-    #                 hamiltonian[orbital][j], width=n))
-    #             n = 18
-    #         output.write('\n')
-    #
-    # output.write('\n')
+    # La llargada dels mo no es la mateixa que el solapament i l'hamiltonià
+    output.write('Overlap matrix: \n')
+    for i in range(int(len(alpha_mo_energies)/5) + (len(alpha_mo_energies)%5 > 0)):
+
+        n_orbitals = list(range(5*i, 5*i + 5))
+        if i == int(len(alpha_mo_energies)/5):
+            if len(alpha_mo_energies)%5 > 0:
+                n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
+
+        n = 18
+        for orbital in n_orbitals:
+            output.write('{:{width}}'.format(orbital + 1, width=n))
+            n = 18
+        output.write('\n')
+        output.write('\n')
+
+        for j in range(len(alpha_mo_coeff[i])):
+            output.write('{:3}'.format(j+1))
+            n = 21
+            for orbital in n_orbitals:
+                output.write('{:{width}.8f}'.format(
+                    overlap[orbital][j], width=n))
+                n = 18
+            output.write('\n')
+
+    output.write('\n')
+
+    output.write('Hamiltonian matrix: \n')
+    for i in range(int(len(alpha_mo_energies)/5) + (len(alpha_mo_energies)%5 > 0)):
+
+        n_orbitals = list(range(5*i, 5*i + 5))
+        if i == int(len(alpha_mo_energies)/5):
+            if len(alpha_mo_energies)%5 > 0:
+                n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
+
+        n = 18
+        for orbital in n_orbitals:
+            output.write('{:{width}}'.format(orbital + 1, width=n))
+            n = 18
+        output.write('\n')
+        output.write('\n')
+
+        for j in range(len(alpha_mo_coeff[i])):
+            output.write('{:3}'.format(j+1))
+            n = 21
+            for orbital in n_orbitals:
+                output.write('{:{width}.8f}'.format(
+                    hamiltonian[orbital][j], width=n))
+                n = 18
+            output.write('\n')
+
+    output.write('\n')
 
 
 def get_array_txt(label, type, array, row_size=5):
@@ -163,7 +162,7 @@ def build_fchk(parsed_data):
     structure = np.array(parsed_data.get_coordinates())#['structure']
     basis = parsed_data.get_molecular_basis()#['basis']
     alpha_mo_coeff = parsed_data.get_eigenvectors()#['coefficients']['alpha']
-    alpha_mo_energies = parsed_data.get_eigenvalues()#['mo_energies']['alpha']
+    alpha_mo_energies = parsed_data.get_mo_energies()#['mo_energies']['alpha']
 
     #overlap = parsed_data['overlap']
     #coor_shell = parsed_data['coor_shell']
