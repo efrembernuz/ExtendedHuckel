@@ -2,7 +2,7 @@ from numpy.distutils.core import setup, Extension
 
 
 def get_version_number():
-    for l in open('symeess/__init__.py', 'r').readlines():
+    for l in open('huckelpy/__init__.py', 'r').readlines():
         if not(l.find('__version__')):
             exec(l, globals())
             return __version__
