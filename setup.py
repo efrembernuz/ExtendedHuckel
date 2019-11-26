@@ -16,5 +16,4 @@ setup(name='huckelpy',
       packages=['huckelpy'],
       package_data={'': ['basis_set.yaml']},
       include_package_data=True,
-      install_requires=['numpy', 'PyYAML', 'scipy'],
-      scripts=['scripts/...'])
+      install_requires=['numpy', 'PyYAML', 'scipy'])
