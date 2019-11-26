@@ -5,7 +5,7 @@ import copy
 import yaml
 import numpy as np
 import scipy.linalg as la
-from pyeh import tools
+from pyeh import tools, atomic_orbital
 from pyeh.overlap_integral import overlap_integral
 
 
@@ -13,26 +13,24 @@ class ExtendedHuckel:
 
     def __init__(self, coordinates, symbols, charge=0, cartesian_orbitals=False):
 
-        # stream = open(os.path.dirname(os.path.abspath(__file__)) + '/basis_set.yaml')
         self.coordinates = coordinates
         self.symbols = symbols
         self.charge = charge
         self.pure_orbitals = not cartesian_orbitals
         self.n_electrons = 0
-
-        self.basis = yaml.load(open(os.path.dirname(os.path.abspath(__file__)) + '/basis_set.yaml'))
-        # matrices_dimensions = self.matrices_dimensions()
-        self.S = np.zeros((self.matrices_dimensions(), self.matrices_dimensions()))
-        self.H = None
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/basis_set.yaml') as file:
+            self.basis = yaml.load(file)
+        self.overlap = np.zeros((self.matrices_dimensions(), self.matrices_dimensions()))
+        self.hamiltonian = None
         self.eigenvalues = None
         self.eigenvectors = None
         self.total_energy = None
         self.coefficients = []
         self.molecular_basis = None
+        self.orbitals_list = []
         self.orbital_vector = []
         self.orbitals_atom = []
         self.atomic_numbers = []
-        # self.S1H = np.zeros((matrices_dimensions, matrices_dimensions))
 
     def set_atom_energy(self, symbol, sp_energy, d_energy=None, f_energy=None):
 
@@ -41,7 +39,10 @@ class ExtendedHuckel:
             self.basis[symbol][1]['VSIP'] = d_energy
         if f_energy is not None:
             self.basis[symbol][2]['VSIP'] = f_energy
-        self.H = None
+        self.overlap = None
+        self.hamiltonian = None
+        self.eigenvalues = None
+        self.eigenvectors = None
 
     def get_coordinates(self):
         return self.coordinates
@@ -53,14 +54,14 @@ class ExtendedHuckel:
         return self.basis
 
     def get_overlap_matrix(self):
-        if not np.any(self.S):
+        if not np.any(self.overlap):
             self.overlap_matrix()
-        return self.S
+        return self.overlap
 
     def get_hamiltonian_matrix(self):
-        if self.H is None:
+        if self.hamiltonian is None:
             self.hamiltonian_matrix()
-        return self.H
+        return self.hamiltonian
 
     def get_mo_coefficients(self):
         if not self.coefficients:
@@ -101,13 +102,11 @@ class ExtendedHuckel:
                 if shell['shell_type'] == 'sp':
                     atomic_orbitals += 4
                 elif shell['shell_type'] == 'd':
-                    # atomic_orbitals += 5
                     if self.pure_orbitals:
                         atomic_orbitals += 5
                     else:
                         atomic_orbitals += 6
                 elif shell['shell_type'] == 'f':
-                    # atomic_orbitals += 7
                     if self.pure_orbitals:
                         atomic_orbitals += 7
                     else:
@@ -170,116 +169,28 @@ class ExtendedHuckel:
     #     self.eigenvectors = np.asarray(new_eigenvectors)
 
     def calculate_energy(self):
-        self.eigenvalues, self.eigenvectors = la.eigh(self.get_hamiltonian_matrix(), b=self.get_overlap_matrix(),
-                                                      type=1)
+        self.eigenvalues, self.eigenvectors = la.eigh(self.get_hamiltonian_matrix(), b=self.get_overlap_matrix())
         idx = np.argsort(self.eigenvalues)
         self.eigenvalues = self.eigenvalues[idx]
         self.eigenvectors = self.eigenvectors[:, idx].T
         # if not self.pure_orbitals:
         #     self.basis_transformation()
 
-    def gaussianxgaussian(self, shell1, shell2, atom1_coordinates, atom2_coordinates, orbital_type1, orbital_type2):
-
-        def double_factorial(n):
-            if n == 0 or n == 1 or n == -1:
-                return 1
-            return n * double_factorial(n - 2)
-
-        def norm_gaussian(orbital_type1, a1, orbital_type2, a2):
-
-            n1, n2 = 0, 0
-            if orbital_type1 == 's':
-                n1 = 1
-            elif 'p' in orbital_type1:
-                n1 = 2
-            elif 'd' in orbital_type1:
-                n1 = 3
-            elif 'f' in orbital_type1:
-                n1 = 4
-            if orbital_type2 == 's':
-                n2 = 1
-            elif 'p' in orbital_type2:
-                n2 = 2
-            elif 'd' in orbital_type2:
-                n2 = 3
-            elif 'f' in orbital_type2:
-                n2 = 4
-
-            norm1 = (a1 ** ((2 * n1 + 1) / 4)) * (2 ** (n1 + 1)) / (
-                    (double_factorial(2 * n1 - 1)) * (2 * np.pi) ** (-1 / 4))
-            norm2 = (a2 ** ((2 * n2 + 1) / 4)) * (2 ** (n2 + 1)) / (
-                    (double_factorial(2 * n2 - 1)) * (2 * np.pi) ** (-1 / 4))
-
-            return norm1 * norm2
-
-        def real_spherical_harmonic(orbital_type):
-            if 's' in orbital_type:
-                return np.sqrt(1 / (4 * np.pi))
-            elif 'p' in orbital_type:
-                return np.sqrt(3 / (4 * np.pi))
-            elif 'd' in orbital_type:
-                return np.sqrt(15 / (4 * np.pi))
-            elif 'f' in orbital_type:
-                return np.sqrt(105 / (4 * np.pi))
-
-        alphas1 = shell1['p_exponents']
-        if 'p' in orbital_type1[1]:
-            coefs1 = shell1['p_con_coefficients']
-        else:
-            coefs1 = shell1['con_coefficients']
-
-        alphas2 = shell2['p_exponents']
-        if 'p' in orbital_type2[1]:
-            coefs2 = shell2['p_con_coefficients']
-        else:
-            coefs2 = shell2['con_coefficients']
+    def orbitalxorbital(self, orbital_obj1, orbital_obj2):
 
         g0 = 0.
-        if orbital_type1[1] == 'dxx - dyy':
-            norm1 = np.sqrt(3/4)
-        elif orbital_type1[1] == 'dzz + dzz - dxx - dyy':
-            norm1 = 1/2
-        elif orbital_type1[1] == 'dxx + dyy + dzz':
-            norm1 = 1 / np.sqrt(5)
-        else:
-            norm1 = 1
-
-        if orbital_type2[1] == 'dxx - dyy':
-            norm2 = np.sqrt(3/4)
-        elif orbital_type2[1] == 'dzz + dzz - dxx - dyy':
-            norm2 = 1/2
-        elif orbital_type2[1] == 'dxx + dyy + dzz':
-            norm2 = 1 / np.sqrt(5)
-        else:
-            norm2 = 1
-
-        operation1 = '+'
-        for ido1, orbital1 in enumerate(orbital_type1[1].split(' ')):
-            operation2 = '+'
-            if ido1 % 2 != 0:
-                operation1 = orbital1
-                pass
-            else:
-                for ido2, orbital2 in enumerate(orbital_type2[1].split(' ')):
-                    g1g2 = 0
-                    if ido2 % 2 != 0:
-                        operation2 = orbital2
-                        pass
-                    else:
-                        for idf1, coef1 in enumerate(coefs1):
-                            a1 = alphas1[idf1]
-                            for idf2, coef2 in enumerate(coefs2):
-                                a2 = alphas2[idf2]
-                                coef = coef1 * coef2
-                                g1g2 += norm1*norm2*coef * norm_gaussian(orbital_type1[1], a1, orbital_type2[1], a2) * \
-                                        real_spherical_harmonic(orbital_type1[1]) * \
-                                        real_spherical_harmonic(orbital_type2[1]) * \
-                                        overlap_integral(orbital1, orbital2, atom1_coordinates,
-                                                         atom2_coordinates, a1, a2)
-                    if operation1 == operation2:
-                        g0 += g1g2
-                    else:
-                        g0 -= g1g2
+        for ido1, orbital1 in enumerate(orbital_obj1.ao_linear_combination[0]):
+            for ido2, orbital2 in enumerate(orbital_obj2.ao_linear_combination[0]):
+                g1g2 = 0
+                for g1_parameters in range(3):
+                    for g2_parameters in range(3):
+                        g1g2 += orbital_obj1.ao_coefficients[g1_parameters]*orbital_obj2.ao_coefficients[g2_parameters] * \
+                                orbital_obj1.gaussian_norm[g1_parameters]*orbital_obj2.gaussian_norm[g2_parameters] * \
+                                orbital_obj1.real_spherical_harmonic() * orbital_obj2.real_spherical_harmonic() * \
+                                overlap_integral(orbital1, orbital2, orbital_obj1.position, orbital_obj2.position,
+                                                 orbital_obj1.ao_exponents[g1_parameters],
+                                                 orbital_obj2.ao_exponents[g2_parameters])
+                g0 += orbital_obj1.ao_linear_combination[1][ido1]*orbital_obj2.ao_linear_combination[1][ido2]*g1g2
 
         return g0
 
@@ -290,98 +201,81 @@ class ExtendedHuckel:
 
     def overlap_matrix(self):
 
-        atom1 = self.get_ao_labels()[0].split('_')[0]
-        atom1_position = 0
-        for ido1, orbital1 in enumerate(self.get_ao_labels()):
-            atom2 = self.get_ao_labels()[0].split('_')[0]
-            atom2_position = 0
+        for ido1, orbital_obj1 in enumerate(self.get_ao_list()):
+            for ido2, orbital_obj2 in enumerate(self.get_ao_list()[ido1:]):
+                self.overlap[ido1][ido1+ido2] = self.orbitalxorbital(orbital_obj1, orbital_obj2)
 
-            if ido1 >= sum(self.orbitals_atom[:atom1_position + 1]):
-                atom1 = orbital1.split('_')[0]
-                atom1_position += 1
-            for ido2, orbital2 in enumerate(self.get_ao_labels()):
-                if ido2 >= sum(self.orbitals_atom[:atom2_position + 1]):
-                    atom2 = orbital2.split('_')[0]
-                    atom2_position += 1
+        self.overlap = self.overlap + self.overlap.T - np.diag(np.diag(self.overlap))
 
-                orbital_type1 = orbital1.split('_')[-1]
-                orbital_type2 = orbital2.split('_')[-1]
-                if 's' in orbital_type1 or 'p' in orbital_type1:
-                    shell1 = self.basis[atom1][self.return_shell_position(self.basis[atom1], 's')]
-                elif 'd' in orbital_type1:
-                    shell1 = self.basis[atom1][self.return_shell_position(self.basis[atom1], 'd')]
-                elif 'f' in orbital_type1:
-                    shell1 = self.basis[atom1][self.return_shell_position(self.basis[atom1], 'f')]
-
-                if 's' in orbital_type2 or 'p' in orbital_type2:
-                    shell2 = self.basis[atom2][self.return_shell_position(self.basis[atom2], 's')]
-                elif 'd' in orbital_type2:
-                    shell2 = self.basis[atom2][self.return_shell_position(self.basis[atom2], 'd')]
-                elif 'f' in orbital_type2:
-                    shell2 = self.basis[atom2][self.return_shell_position(self.basis[atom2], 'f')]
-
-                row1 = tools.get_element_row(atom1)
-                row2 = tools.get_element_row(atom2)
-                if 'd' in orbital_type1:
-                    row1 -= 1
-                elif 'f' in orbital_type1:
-                    row1 -= 2
-
-                if 'd' in orbital_type2:
-                    row2 -= 1
-                elif 'f' in orbital_type2:
-                    row2 -= 2
-
-                self.S[ido1][ido2] = self.gaussianxgaussian(shell1, shell2, self.coordinates[atom1_position],
-                                                            self.coordinates[atom2_position], [row1, orbital_type1],
-                                                            [row2, orbital_type2])
-
-        norm_vector = [1 / np.sqrt(x) for x in np.diag(self.S)]
-        for i in range(len(self.S)):
-            for j in range(len(self.S[i])):
-                self.S[i][j] *= norm_vector[i] * norm_vector[j]
+        norm_vector = [1 / np.sqrt(x) for x in np.diag(self.overlap)]
+        for i in range(len(self.overlap)):
+            for j in range(len(self.overlap[i])):
+                self.overlap[i][j] *= norm_vector[i] * norm_vector[j]
 
     def hamiltonian_matrix(self):
 
-        self.H = np.zeros((self.matrices_dimensions(), self.matrices_dimensions()))
-        eV_to_Ha = 3.67493095E-2
+        self.hamiltonian = np.zeros((self.matrices_dimensions(), self.matrices_dimensions()))
+        ev_to_ha = 3.67493095E-2
         k = 0.75
-        if not np.any(self.S):
+        if not np.any(self.overlap):
             self.get_overlap_matrix()
-        for ido1, orbital1 in enumerate(self.get_ao_labels()):
-            for ido2, orbital2 in enumerate(self.get_ao_labels()):
+        for ido1, orbital_obj1 in enumerate(self.get_ao_list()):
+            for ido2, orbital_obj2 in enumerate(self.get_ao_list()):
                 if ido1 == ido2:
-                    h = self.get_VSIP(orbital1)
-                    self.H[ido1][ido2] = h * eV_to_Ha
+                    h = orbital_obj1.energy
+                    self.hamiltonian[ido1][ido2] = h * ev_to_ha
                 else:
-                    h1 = self.get_VSIP(orbital1)
-                    h2 = self.get_VSIP(orbital2)
-                    A = (h1 - h2) / (h1 + h2)
-                    K = 1 + k + A ** 2 - k * A ** 4
-                    self.H[ido1][ido2] = K * (h1 + h2) * (1 / 2) * eV_to_Ha * self.S[ido1][ido2]
+                    h1 = orbital_obj1.energy
+                    h2 = orbital_obj2.energy
+                    a = (h1 - h2) / (h1 + h2)
+                    eh_constant = 1 + k + a ** 2 - k * a ** 4
+                    self.hamiltonian[ido1][ido2] = eh_constant * (h1 + h2) * (1 / 2) * ev_to_ha * self.overlap[ido1][ido2]
 
-    def get_VSIP(self, orbital_type):
-        atom = orbital_type.split('_')[0]
-        if orbital_type.split('_')[1] == 's':
-            return self.basis[atom][self.return_shell_position(self.basis[atom], 's')]['VSIP'][0]
-        elif 'p' in orbital_type.split('_')[1]:
-            return self.basis[atom][self.return_shell_position(self.basis[atom], 's')]['VSIP'][1]
-        elif 'd' in orbital_type.split('_')[1]:
-            return self.basis[atom][self.return_shell_position(self.basis[atom], 'd')]['VSIP'][0]
-        elif 'f' in orbital_type.split('_')[1]:
-            return self.basis[atom][self.return_shell_position(self.basis[atom], 'p')]['VSIP'][0]
-
-    def get_ao_labels(self):
+    def get_ao_list(self):
         cartesian_basis = {'s': ['s'],
                            'sp': ['s', 'px', 'py', 'pz'],
-                           'd': ['dxx - dyy', 'dzz + dzz - dxx - dyy', 'dxx + dyy + dzz', 'dxy', 'dxz', 'dyz'],
+                           'd': ['dxx', 'dyy', 'dzz', 'dxy', 'dxz', 'dyz'],
                            'f': ['fxxx', 'fyyy', 'fzzz', 'fxyy', 'fxxy', 'fxxz', 'fxzz', 'fyzz', 'fyyz', 'fxyz']}
         # cartesian_basis = {'s': ['s'],
         #                    'sp': ['s', 'px', 'py', 'pz'],
         #                    'd': ['dxx - dyy', 'dzz + dzz - dxx - dyy', 'dxy', 'dxz', 'dyz']}
         pure_basis = {'s': ['s'],
                       'sp': ['s', 'px', 'py', 'pz'],
-                      'd': ['dzz + dzz - dxx - dyy', 'dxz', 'dyz', 'dxx - dyy', 'dxy']}
+                      # 'd': ['dzz + dzz - dxx - dyy', 'dxz', 'dyz', 'dxx - dyy', 'dxy']
+                      'd': ['dz2', 'dxz', 'dyz', 'dx2-y2', 'dxy']
+                      }
+
+        if self.pure_orbitals:
+            basis = pure_basis
+        else:
+            basis = cartesian_basis
+
+        if not self.orbitals_list:
+            for ids, symbol in enumerate(self.symbols):
+                for shell in self.basis[symbol]:
+                    for orbital_type in basis[shell['shell_type']]:
+                        if 'p' in orbital_type:
+                            eh_energy = shell['VSIP'][1]
+                        else:
+                            eh_energy = shell['VSIP'][0]
+                        self.orbitals_list.append([atomic_orbital.AtomicOrbital(symbol, shell, self.coordinates[ids],
+                                                                                orbital_type, eh_energy)])
+            self.orbitals_list = [y for x in self.orbitals_list for y in x]
+        return self.orbitals_list
+
+    def get_ao_labels(self):
+        cartesian_basis = {'s': ['s'],
+                           'sp': ['s', 'px', 'py', 'pz'],
+                           'd': ['dxx', 'dyy', 'dzz', 'dxy', 'dxz', 'dyz'],
+                           'f': ['fxxx', 'fyyy', 'fzzz', 'fxyy', 'fxxy', 'fxxz', 'fxzz', 'fyzz', 'fyyz', 'fxyz']}
+        # cartesian_basis = {'s': ['s'],
+        #                    'sp': ['s', 'px', 'py', 'pz'],
+        #                    'd': ['dxx - dyy', 'dzz + dzz - dxx - dyy', 'dxy', 'dxz', 'dyz']}
+        pure_basis = {'s': ['s'],
+                      'sp': ['s', 'px', 'py', 'pz'],
+                      # 'd': ['dzz + dzz - dxx - dyy', 'dxz', 'dyz', 'dxx - dyy', 'dxy']
+                      'd': ['dz2', 'dxz', 'dyz', 'dx2-y2', 'dxy']
+                      }
 
         if self.pure_orbitals:
             basis = pure_basis
@@ -389,7 +283,7 @@ class ExtendedHuckel:
             basis = cartesian_basis
 
         if not self.orbital_vector:
-            for symbol in self.symbols:
+            for ids, symbol in enumerate(self.symbols):
                 n_atomic_orbitals = 0
                 for shell in self.basis[symbol]:
                     self.orbital_vector.append([symbol + '_' + x for x in basis[shell['shell_type']]])

@@ -9,7 +9,7 @@ def distance(p1, p2):
     return np.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2 + (p1[2] - p2[2]) ** 2)
 
 
-def E(s, t):
+def number_of_sum(s, t):
     if (s+t)%2 == 0:
         return int(0.5*(s+t))
     else:
@@ -22,7 +22,7 @@ def combination(n, k):
     return math.factorial(n)/(math.factorial(k)*math.factorial(n - k))
 
 
-def f(t, m, n, a, b):
+def binomial_products(t, m, n, a, b):
     fn = 0
     for i in range(t+1):
         if m-i < 0 or n-t+i < 0:
@@ -56,18 +56,19 @@ def overlap_integral(orbital_type1, orbital_type2, coordinates_atom1, coordinate
     orbital2 = orbital_type_to_vector[orbital_type2]
     exponential = ((np.pi/(a1 + a2))**(3/2)*np.exp(-(R12**2)*(a1*a2/(a1 + a2))))
 
-    F = 1
+    sum_of_binomial_products = 1
     Angs2Bohr = 1 / 5.2917726E-1
     for i in range(0,3):
-        max_E = E(orbital1[i], orbital2[i])
+        max_number_of_sum = number_of_sum(orbital1[i], orbital2[i])
         fxyz = 0
-        for j in range(max_E+1):
+        for j in range(max_number_of_sum+1):
             a = Angs2Bohr*(coordinates_atom2[i] - coordinates_atom1[i])*a2/(a1 + a2)
             b = Angs2Bohr*(coordinates_atom1[i] - coordinates_atom2[i])*a1/(a1 + a2)
-            fxyz += f(2*j, orbital1[i], orbital2[i], a, b)*double_factorial(2*j-1)/((2**j)*(a1+a2)**j)
-        F *= fxyz
+            fxyz += binomial_products(2 * j, orbital1[i], orbital2[i], a, b) * \
+                    double_factorial(2 * j - 1) / ((2 ** j) * (a1 + a2) ** j)
+        sum_of_binomial_products *= fxyz
 
-    overlap = exponential*F
+    overlap = exponential*sum_of_binomial_products
 
     return overlap
 

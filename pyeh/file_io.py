@@ -3,6 +3,7 @@ from pyeh import tools
 
 eV_to_Ha = 3.67493095E-2
 
+
 def build_output(parsed_data, filename):
 
     output = open(filename+'.out', 'w')
@@ -12,7 +13,7 @@ def build_output(parsed_data, filename):
     alpha_mo_coeff = parsed_data.get_eigenvectors()  # ['coefficients']['alpha']
     # alpha_mo_coeff = parsed_data.get_mo_coefficients()
     alpha_mo_energies = np.real(parsed_data.get_mo_energies())  # ['mo_energies']['alpha']
-    ao_labels = parsed_data.get_ao_labels()
+    ao_list = parsed_data.get_ao_list()
     overlap = parsed_data.get_overlap_matrix()
     hamiltonian = parsed_data.get_hamiltonian_matrix()
 
@@ -25,19 +26,6 @@ def build_output(parsed_data, filename):
                                                               structure[ids][2]))
         output.write('\n')
 
-    for symbol in symbols:
-        labeled_ao = []
-        for orbital_label in ao_labels:
-            if 'd' in orbital_label.split('_')[1]:
-                row = str(tools.get_element_row(symbol) - 1)
-            elif 'f' in orbital_label.split('_')[1]:
-                row = str(tools.get_element_row(symbol) - 2)
-            else:
-                row = str(tools.get_element_row(symbol))
-
-            labeled_ao.append((orbital_label.replace(symbol, row)))
-        ao_labels = labeled_ao
-
     output.write('Molecular Orbital Coefficients: \n')
     for i in range(int(len(alpha_mo_energies)/5) + (len(alpha_mo_energies)%5 > 0)):
 
@@ -46,35 +34,29 @@ def build_output(parsed_data, filename):
             if len(alpha_mo_energies)%5 > 0:
                 n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
 
-        n = 18
+        width = 20
         for orbital in n_orbitals:
-            output.write('{:{width}}'.format(orbital + 1, width=n))
-            n = 18
+            output.write('{:{width}}'.format(orbital + 1, width=width))
+            width = 18
         output.write('\n')
-        n = 13
+        width = 14
         output.write('Eigenvalues')
         for orbital in n_orbitals:
-            output.write('{:{width}.8f}'.format(alpha_mo_energies[orbital]/eV_to_Ha, width=n))
-            n = 18
+            output.write('{:{width}.8f}'.format(alpha_mo_energies[orbital]/eV_to_Ha, width=width))
+            width = 18
         output.write('\n')
         output.write('\n')
 
         for j in range(len(alpha_mo_coeff[i])):
-            n = 15
-            if 'dzz + dzz' in ao_labels[j]:
-                output.write('{:3} {:5}'.format(j + 1, '3dzz'))
-            elif 'dxx - dyy' in ao_labels[j]:
-                output.write('{:3} {:5}'.format(j + 1, '3dxx-yy'))
-                n = 13
-            elif 'dxx + dyy + dzz' in ao_labels[j]:
-                output.write('{:3} {:5}'.format(j + 1, '3d~s'))
-            else:
-                output.write('{:3} {:5}'.format(j+1, (ao_labels[j].replace('_', ''))))
+            width = 15
+            output.write('{:4} {:5}'.format(j+1, ao_list[j].row+ao_list[j].type))
+            if ao_list[j].type == 'dx2-y2':
+                width = 13
 
             for orbital in n_orbitals:
                 output.write('{:{width}.8f}'.format(
-                    alpha_mo_coeff[orbital][j], width=n))
-                n = 18
+                    alpha_mo_coeff[orbital][j], width=width))
+                width = 18
             output.write('\n')
 
     output.write('\n')
@@ -90,20 +72,20 @@ def build_output(parsed_data, filename):
             if len(alpha_mo_energies)%5 > 0:
                 n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
 
-        n = 18
+        width = 20
         for orbital in n_orbitals:
-            output.write('{:{width}}'.format(orbital + 1, width=n))
-            n = 18
+            output.write('{:{width}}'.format(orbital + 1, width=width))
+            width = 18
         output.write('\n')
         output.write('\n')
 
         for j in range(len(alpha_mo_coeff[i])):
             output.write('{:3}'.format(j+1))
-            n = 21
+            width = 21
             for orbital in n_orbitals:
                 output.write('{:{width}.8f}'.format(
-                    overlap[orbital][j], width=n))
-                n = 18
+                    overlap[orbital][j], width=width))
+                width = 18
             output.write('\n')
 
     output.write('\n')
@@ -116,20 +98,20 @@ def build_output(parsed_data, filename):
             if len(alpha_mo_energies)%5 > 0:
                 n_orbitals = n_orbitals[:len(alpha_mo_energies[n_orbitals[0]:])]
 
-        n = 18
+        width = 20
         for orbital in n_orbitals:
-            output.write('{:{width}}'.format(orbital + 1, width=n))
-            n = 18
+            output.write('{:{width}}'.format(orbital + 1, width=width))
+            width = 18
         output.write('\n')
         output.write('\n')
 
         for j in range(len(alpha_mo_coeff[i])):
             output.write('{:3}'.format(j+1))
-            n = 21
+            width = 21
             for orbital in n_orbitals:
                 output.write('{:{width}.8f}'.format(
-                    hamiltonian[orbital][j], width=n))
-                n = 18
+                    hamiltonian[orbital][j], width=width))
+                width = 18
             output.write('\n')
 
     output.write('\n')
