@@ -1,5 +1,4 @@
 import numpy as np
-from pyeh import tools
 
 eV_to_Ha = 3.67493095E-2
 
@@ -127,7 +126,6 @@ def get_array_txt(label, type, array, row_size=5):
 
     txt_fchk = '{:40}   {}   N=       {:5}\n'.format(label, type, n_elements)
 
-    # print(rows)
     for i in range(rows):
         if (i+1)*row_size > n_elements:
             txt_fchk += (' {:{fmt}}'* (n_elements - i*row_size) + '\n').format(*array[i * row_size:n_elements],

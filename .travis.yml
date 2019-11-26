@@ -1,0 +1,38 @@
+language: python
+
+python:
+  - "2.7"
+  - "3.4"
+
+branches:
+  only:
+    - master
+
+notifications:
+  email:
+  - komuisan@gmail.com
+
+install:
+    - pip install coverage
+    - pip install python-coveralls
+    - pip install -r requirements.txt
+    - pip install -e .
+
+script:
+    - cd tests
+    - coverage run --source=../ExtendedHuckel -m unittest discover . "test_*.py"
+
+after_success:
+    - coveralls
+    - cd ..
+
+deploy:
+  - provider: pypi
+    distributions: sdist
+    user: efrem
+    password:
+      secure: "P7JWFL8JXrP2R4dslJV6mqno32D6umaPWOJT5RIyGkxyC7K9kqGjPWDaV6Xfa2AiAqDMnasoSnlJ7Xvgfqj4FQ4sjAEB5IMvJcqdLBH3iyMymj+sSlH9tJpU9Yp2dLkMwxJHofpGQyJJgZTBKo4Z+wDDXh6a4LbXCyyGPG/Zu1DXxBK8IDpOBu3Y+hiDMlrYi8iKK4U1rj5YlckAONzdsy0Z4Pgd0NBr48P1rVpXp2R+UhsI3euZB6VwPLCztwpW/U7nwdSBXyMpPuBbIkp3nfCN8+iLYSbbmiUjnaQ0at780KMMRcex7zrkfyoMLXG+lYZwt46eKgxei6lM8/OsZn5rul6uxH6XVaN8954VSCAVBFjGrX10p8xAe64qh9g4f+pAGo0DLK7jOu22LldFn5D8dBWvNmVLltat+ujQPJ/keFXaGkNvao1uISN7EtjbCwGPfDZ6/3h0lMFK7GEQnFzoKUESlxBwRUh2Sv55WgurHJXwYTAeJmKsWu8QjJAQiRuZQ3L06Nq8a6Tt6kH3hOSnhk5oDS+oYqEXC7DVV8woKkFDkWmwg09qdobJG4EZmgoFGWcDEYWGjYpNRbB8riHW2QtYeLva/6sFOc9s6ZFq761B4LXjFhJr5EnBAE911l/Ds7XBsZJP8fIxdWdAbHbTVPt6B4Vu6f0KBYOuAGM="
+    skip_existing: true
+    on:
+      branch: master
+      tags: false

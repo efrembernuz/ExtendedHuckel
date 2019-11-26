@@ -1,5 +1,5 @@
 import unittest
-from pyeh import ExtendedHuckel
+from huckelpy import ExtendedHuckel
 import numpy as np
 
 

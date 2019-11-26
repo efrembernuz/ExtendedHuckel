@@ -5,8 +5,8 @@ import copy
 import yaml
 import numpy as np
 import scipy.linalg as la
-from pyeh import tools, atomic_orbital
-from pyeh.overlap_integral import overlap_integral
+from huckelpy import tools, atomic_orbital
+from huckelpy.overlap_integral import overlap_integral
 
 
 class ExtendedHuckel:

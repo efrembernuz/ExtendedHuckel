@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from pyeh import tools
+from huckelpy import tools
 
 
 class AtomicOrbital():
