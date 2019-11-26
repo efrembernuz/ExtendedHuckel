@@ -1,4 +1,4 @@
-from numpy.distutils.core import setup, Extension
+from numpy.distutils.core import setup
 
 
 def get_version_number():
