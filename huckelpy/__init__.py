@@ -263,35 +263,6 @@ class ExtendedHuckel:
             self.orbitals_list = [y for x in self.orbitals_list for y in x]
         return self.orbitals_list
 
-    def get_ao_labels(self):
-        cartesian_basis = {'s': ['s'],
-                           'sp': ['s', 'px', 'py', 'pz'],
-                           'd': ['dxx', 'dyy', 'dzz', 'dxy', 'dxz', 'dyz'],
-                           'f': ['fxxx', 'fyyy', 'fzzz', 'fxyy', 'fxxy', 'fxxz', 'fxzz', 'fyzz', 'fyyz', 'fxyz']}
-        # cartesian_basis = {'s': ['s'],
-        #                    'sp': ['s', 'px', 'py', 'pz'],
-        #                    'd': ['dxx - dyy', 'dzz + dzz - dxx - dyy', 'dxy', 'dxz', 'dyz']}
-        pure_basis = {'s': ['s'],
-                      'sp': ['s', 'px', 'py', 'pz'],
-                      # 'd': ['dzz + dzz - dxx - dyy', 'dxz', 'dyz', 'dxx - dyy', 'dxy']
-                      'd': ['dz2', 'dxz', 'dyz', 'dx2-y2', 'dxy']
-                      }
-
-        if self.pure_orbitals:
-            basis = pure_basis
-        else:
-            basis = cartesian_basis
-
-        if not self.orbital_vector:
-            for ids, symbol in enumerate(self.symbols):
-                n_atomic_orbitals = 0
-                for shell in self.basis[symbol]:
-                    self.orbital_vector.append([symbol + '_' + x for x in basis[shell['shell_type']]])
-                    n_atomic_orbitals += len(basis[shell['shell_type']])
-                self.orbitals_atom.append(n_atomic_orbitals)
-            self.orbital_vector = [y for x in self.orbital_vector for y in x]
-        return self.orbital_vector
-
     def get_number_of_electrons(self):
         if self.n_electrons == 0:
             for symbol in self.symbols:
