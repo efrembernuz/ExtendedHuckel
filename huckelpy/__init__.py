@@ -1,4 +1,4 @@
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 import os
 import copy
@@ -19,7 +19,7 @@ class ExtendedHuckel:
         self.pure_orbitals = not cartesian_orbitals
         self.n_electrons = 0
         with open(os.path.dirname(os.path.abspath(__file__)) + '/basis_set.yaml') as file:
-            self.basis = yaml.load(file)
+            self.basis = yaml.load(file, Loader=yaml.FullLoader)
         self.overlap = np.zeros((self.matrices_dimensions(), self.matrices_dimensions()))
         self.hamiltonian = None
         self.eigenvalues = None
