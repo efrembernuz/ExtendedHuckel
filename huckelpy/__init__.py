@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 import os
 import copy
@@ -116,65 +116,11 @@ class ExtendedHuckel:
             matrices_dimensions += atomic_orbitals
         return matrices_dimensions
 
-    # def basis_transformation(self):
-    #     orbital_df_positions = [[]]
-    #     new_basis = ['dxx', 'dyy', 'dzz', 'dxy', 'dxz', 'dyz']
-    #     new_eigenvectors = np.ndarray.tolist(self.eigenvectors.copy())
-    #
-    #     nd = 0
-    #     yz_positions = []
-    #     for ido, orbital in enumerate(self.orbital_vector):
-    #         current_atom = orbital.split('_')[0]
-    #         if 'd' in orbital:
-    #
-    #             if nd == 4:
-    #                 yz_positions.append(ido+1)
-    #             elif nd > 4:
-    #                 nd = 0
-    #                 orbital_df_positions.append([current_atom, [ido]])
-    #             else:
-    #                 if current_atom in orbital_df_positions[-1]:
-    #                     orbital_df_positions[-1][1].append(ido)
-    #                 else:
-    #                     orbital_df_positions.append([current_atom, [ido]])
-    #             self.orbital_vector[ido] = current_atom + '_' + new_basis[nd]
-    #             nd += 1
-    #     orbital_df_positions.pop(0)
-    #     for yz in yz_positions:
-    #         current_atom = self.orbital_vector[yz-1].split('_')[0]
-    #         self.orbital_vector.insert(yz, current_atom + '_dyz')
-    #
-    #     new_eigenvalues = np.ndarray.tolist(self.eigenvalues.copy())
-    #     last_eigenvalue = new_eigenvalues[-1]
-    #     for current_atom, suborbital in orbital_df_positions:
-    #         #cal arreglar que passa quan hi ha més de dos metalls suborbital+1?
-    #         for ide, mo in enumerate(self.eigenvectors):
-    #             # new_eigenvectors[ide][suborbital[0]] = (mo[suborbital[0]]*np.sqrt(3/4) - mo[suborbital[1]]/2 +
-    #             #                                         mo[suborbital[2]]/np.sqrt(5))
-    #             # new_eigenvectors[ide][suborbital[1]] = (-mo[suborbital[0]]*np.sqrt(3/4) - mo[suborbital[1]]/2 +
-    #             #                                         mo[suborbital[2]]/np.sqrt(5))
-    #             # new_eigenvectors[ide][suborbital[2]] = (2*(mo[suborbital[1]])/2 +
-    #             #                                         mo[suborbital[2]]/np.sqrt(5))
-    #             new_eigenvectors[ide][suborbital[0]] = (mo[suborbital[0]] * np.sqrt(3 / 4) - mo[suborbital[1]] / 2)
-    #             new_eigenvectors[ide][suborbital[1]] = (-mo[suborbital[0]] * np.sqrt(3 / 4) - mo[suborbital[1]] / 2)
-    #             new_eigenvectors[ide].insert(suborbital[2], (2 * (mo[suborbital[1]]) / 2))
-    #
-    #         new_eigenvectors.append([0]*len(new_eigenvectors[-1]))
-    #         new_eigenvectors[-1][suborbital[0]] = 1
-    #         new_eigenvectors[-1][suborbital[1]] = 1
-    #         new_eigenvectors[-1][suborbital[2]] = 1
-    #         new_eigenvalues.append(1.1*last_eigenvalue)
-    #
-    #     self.eigenvalues = np.asarray(new_eigenvalues)
-    #     self.eigenvectors = np.asarray(new_eigenvectors)
-
     def calculate_energy(self):
         self.eigenvalues, self.eigenvectors = la.eigh(self.get_hamiltonian_matrix(), b=self.get_overlap_matrix())
         idx = np.argsort(self.eigenvalues)
         self.eigenvalues = self.eigenvalues[idx]
         self.eigenvectors = self.eigenvectors[:, idx].T
-        # if not self.pure_orbitals:
-        #     self.basis_transformation()
 
     def orbitalxorbital(self, orbital_obj1, orbital_obj2):
 
@@ -236,14 +182,9 @@ class ExtendedHuckel:
                            'sp': ['s', 'px', 'py', 'pz'],
                            'd': ['dxx', 'dyy', 'dzz', 'dxy', 'dxz', 'dyz'],
                            'f': ['fxxx', 'fyyy', 'fzzz', 'fxyy', 'fxxy', 'fxxz', 'fxzz', 'fyzz', 'fyyz', 'fxyz']}
-        # cartesian_basis = {'s': ['s'],
-        #                    'sp': ['s', 'px', 'py', 'pz'],
-        #                    'd': ['dxx - dyy', 'dzz + dzz - dxx - dyy', 'dxy', 'dxz', 'dyz']}
         pure_basis = {'s': ['s'],
                       'sp': ['s', 'px', 'py', 'pz'],
-                      # 'd': ['dzz + dzz - dxx - dyy', 'dxz', 'dyz', 'dxx - dyy', 'dxy']
-                      'd': ['dz2', 'dxz', 'dyz', 'dx2-y2', 'dxy']
-                      }
+                      'd': ['dz2', 'dxz', 'dyz', 'dx2-y2', 'dxy']}
 
         if self.pure_orbitals:
             basis = pure_basis

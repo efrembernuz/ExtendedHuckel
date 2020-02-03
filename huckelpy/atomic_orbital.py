@@ -3,7 +3,7 @@ import copy
 from huckelpy import tools
 
 
-class AtomicOrbital():
+class AtomicOrbital:
 
     def __init__(self, atom, atomic_basis, position, orbital_type, eh_energy):
 
