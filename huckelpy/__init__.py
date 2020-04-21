@@ -1,4 +1,4 @@
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 import os
 import copy
@@ -31,6 +31,14 @@ class ExtendedHuckel:
         self.orbital_vector = []
         self.orbitals_atom = []
         self.atomic_numbers = []
+
+    @property
+    def multiplicity(self):
+        return self.get_multiplicity()
+
+    @property
+    def number_of_electrons(self):
+        return self.get_number_of_electrons()
 
     def set_atom_energy(self, symbol, sp_energy, d_energy=None, f_energy=None):
 
@@ -214,10 +222,10 @@ class ExtendedHuckel:
 
     def get_multiplicity(self):
         if self.get_number_of_electrons() % 2 == 0:
-            self.multiplicity = 1
+            self._multiplicity = 1
         else:
-            self.multiplicity = 2
-        return self.multiplicity
+            self._multiplicity = 2
+        return self._multiplicity
 
     def get_atomic_numbers(self):
         if not self.atomic_numbers:
