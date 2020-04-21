@@ -1,5 +1,8 @@
 language: python
 
+os:
+  - linux
+
 python:
   - "2.7"
   - "3.4"
@@ -14,7 +17,7 @@ notifications:
 
 install:
     - pip install coverage
-    - pip install python-coveralls
+    - pip install coveralls
     - pip install -r requirements.txt
     - pip install -e .
 
