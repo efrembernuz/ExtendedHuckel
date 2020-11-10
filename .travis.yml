@@ -23,11 +23,11 @@ after_success:
 - cd ..
 deploy:
   - provider: pypi
-#    distributions: sdist
+    distributions: sdist
     user: "__token__"
     password:
       secure: "pypi-AgEIcHlwaS5vcmcCJDY3NmM4YjdkLWNiYzEtNDNmNC1iY2ZjLTY5ZmJkNTU3ZmQzYQACOXsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJodWNrZWxweSJdfSwgInZlcnNpb24iOiAxfQAABiDjty7gaDeUKyEX5j81tgE_H_dszdakS4m3fgy604zDZA"
-#    skip_existing: true
-#    on:
-#      branch: master
-#      tags: false
+    skip_existing: true
+    on:
+      branch: master
+      tags: false
