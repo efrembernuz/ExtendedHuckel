@@ -24,9 +24,9 @@ after_success:
 deploy:
   - provider: pypi
     distributions: sdist
-    user: "__token__"
+    user: efrem
     password:
-      secure: "pypi-AgEIcHlwaS5vcmcCJDY3NmM4YjdkLWNiYzEtNDNmNC1iY2ZjLTY5ZmJkNTU3ZmQzYQACOXsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJodWNrZWxweSJdfSwgInZlcnNpb24iOiAxfQAABiDjty7gaDeUKyEX5j81tgE_H_dszdakS4m3fgy604zDZA"
+      secure: "GMquEOnDDCv8rLCkqw2wN1dlabcwCg83vLMoUbNmMdI5DXf5udbtnJ+AUQCbNMS4ZPoPpM6Ni4ll+VosD4zD1OU0o0BoRYP7NPFz9dynleTQppjbvkO2zpSq7r/t4lx67z6TVtTqiWQjAPtqt4ST8RcZNVnUZXPRnjZDNz2DeBRhfygJ9q4s0PGp79b5jV4gaUyVKNDz+gkxu208jsbTFfgvkaQ1AKL2ljy5H4f3J7/CajhwYW2/UWDn2OtwZfMb3DmKRMGd5GNiJ6GCgpbEsPuzxdYGqy/t4asLk8aiBJvMZT65CbhhwD2VmLbM076c4ljpb9eJnwt9N52dSpjevgWbYf2wvd1NAgVQ5dWYOem36Yc6OxIHNHnwaVnofdeIJSQNLHTDXEkSCubVA7l1i96UYznsZUzNvbJQDXrjcmQPLg7Nl3yzb2SYvDkpU2BqRwtDBxOhI4pWnd8NA1JwcX3gwNnGrFfybTGsZy6W9naJ9+CtxD+Lm7GhSFj8NB4H57B8KheE3ChG7OCSOmydxf7umsYW7+T1cN7U9ZhU4yIKc2UUaHxxGl1OpQOIrJKtXyH2mbdNlxDY4sJOTxVsaJI+fUiVfHzxSxBK9fMKwubp/d+1Q6SeqBiBDK/s98PxjLHxFBH1p4BAjMLR4/oPEDxpX6GxSSJPwjRDeAsGB9s="
     skip_existing: true
     on:
       branch: master
