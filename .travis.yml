@@ -1,41 +1,36 @@
 language: python
-
 os:
-  - linux
-
+- linux
 python:
-  - "2.7"
-  - "3.5"
-
+- '2.7'
+- '3.5'
 branches:
   only:
-    - master
-
+  - master
 notifications:
   email:
   - komuisan@gmail.com
-
 install:
-    - pip install coverage
-    - pip install coveralls
-    - pip install -r requirements.txt
-    - pip install -e .
-
+- pip install coverage
+- pip install coveralls
+- pip install -r requirements.txt
+- pip install -e .
 script:
-    - cd tests
-    - coverage run --source=../ExtendedHuckel -m unittest discover . "test_*.py"
-
+- cd tests
+- coverage run --source=../ExtendedHuckel -m unittest discover . "test_*.py"
 after_success:
-    - coveralls
-    - cd ..
-
+- coveralls
+- cd ..
 deploy:
+  matrix:
   - provider: pypi
     distributions: sdist
-    user: efrem
+    user: efrembernuz
     password:
-      secure: "PdklGL2cimRlQDdHwCkAtXZ1GjaWJ1G82SXvt7N21xJUcy22cUNKEFlUXCF4ysj2YpI8n+MUhSAuhlCii07s5qpXP/CLVrYPfZ4GISlzgfhjFz0zFWJDlnvfXBs3ya8UMXvP/UuzQeQc6WJEBrvrMNsMPzoPr7iyzfOJp+T8758y3j4Z807wb6UPMT8uptKnZms0cHRrOhlgcxm8/2K0WSTEaA5GbPVCONzE3GollvmhO4RbwVOe3Xr1kfsMp0ENd46jqrhH7CCGxSkkBCFlv074JvzP5pQn8RxDqIjnG3y4VdFcd+YKWH1hocDdRls4hcGPv7df1Pk9eEQ+K2C2gXQWoc/f53OV9j4HEMQo3m0Gkqalg75Iu/E/qQDkk89r8hGkjZiyOOxthpMQwg33/viztxEAFw1Q2kKzJTDIP358qVI7T/c8vm7wLcDHz7UHAxBKLbP4tve0Lk6HsrYuRJz8paNh4G/uurs7Dfh+5AYTVuMXi23mQ3n8zBPFSiz16qc/Y4C0sA/wzG5U2dX5KkAPZrxeShLFL8G/cL81l1RjY4rhwDVMSHWMyHEXJ0Pf0MHoI7p2GeqGsrISE8/UifcLjvaM3Qe0SBUljEwweOES/R33gd1jOnM8vi7AoBhRcPLu3YHaFNsFNKpwnsTAz0muiXbUYxo/WRY9bso2rjY="
+      secure: PdklGL2cimRlQDdHwCkAtXZ1GjaWJ1G82SXvt7N21xJUcy22cUNKEFlUXCF4ysj2YpI8n+MUhSAuhlCii07s5qpXP/CLVrYPfZ4GISlzgfhjFz0zFWJDlnvfXBs3ya8UMXvP/UuzQeQc6WJEBrvrMNsMPzoPr7iyzfOJp+T8758y3j4Z807wb6UPMT8uptKnZms0cHRrOhlgcxm8/2K0WSTEaA5GbPVCONzE3GollvmhO4RbwVOe3Xr1kfsMp0ENd46jqrhH7CCGxSkkBCFlv074JvzP5pQn8RxDqIjnG3y4VdFcd+YKWH1hocDdRls4hcGPv7df1Pk9eEQ+K2C2gXQWoc/f53OV9j4HEMQo3m0Gkqalg75Iu/E/qQDkk89r8hGkjZiyOOxthpMQwg33/viztxEAFw1Q2kKzJTDIP358qVI7T/c8vm7wLcDHz7UHAxBKLbP4tve0Lk6HsrYuRJz8paNh4G/uurs7Dfh+5AYTVuMXi23mQ3n8zBPFSiz16qc/Y4C0sA/wzG5U2dX5KkAPZrxeShLFL8G/cL81l1RjY4rhwDVMSHWMyHEXJ0Pf0MHoI7p2GeqGsrISE8/UifcLjvaM3Qe0SBUljEwweOES/R33gd1jOnM8vi7AoBhRcPLu3YHaFNsFNKpwnsTAz0muiXbUYxo/WRY9bso2rjY=
     skip_existing: true
     on:
       branch: master
       tags: false
+  password:
+    secure: J6wIuo5SdIVGYgil26uJpOSyKWRRqX86FiTSfBQ1cARESTMBY6SSyroqFifyaqdt+DYL/w0BAutnA4givhtE8MiPOiKyEj7T7/R0XyYxYt3fbZwxBDeAt/XSoZtndjGqnhAhpUaD6AuPVW+WcUypRCFLM5Rc05NIKxWtcrWQRFFeocX4wZQPutgDPlvj+cAP/cslfexlOUAq8xINybk1Mo0p/QwDIcKVXqVE/z3mcRq6LvmrYI9T/7FcC6EDuZIIg5PF3Mfox4r0/BOBr6qQkQpO9W/l4sXkKLUJ0cfIT/RRNQA3ULWaBUORNLYefCCZLGJkBZpGO8chp/JDR/mj5X/Mr+hhlhCFfmuyuUlz9KJSKUvhUS+wENGRBp03iqOWidy1sICZAmw8wohRHWT7gWxxc0Tf21n0rRcEefQU//Dx30Z+vboEbr1KxlLulrP/aDQDhsay8DoWZHt7O54Zb77qo/wNpEPL9/RV6BblzNaC0aucSV/JknGhBpmzeNzF2ui6Lf7yZuXONmhQktfOf9s+ibWrL34wK3QxeCW0MSGOTIMHx8yQqNsBuL7fX79uWhUDx/xNm1xwFph4di7sPdwx2DDS0kYgsExznvsnztxAP4D8Jk1hMlRmK0+vbUCQdjBcCwU7f0mYjqmpZvRA1UeZxr+7lVwa86HFMCsEo/8=
