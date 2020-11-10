@@ -26,7 +26,7 @@ deploy:
 #    distributions: sdist
     user: "__token__"
     password:
-      secure: "pZPYlFCocYc71P9Y+APAeO8/+5NuNKK2T/BMSvFNIRpGDOIkoqM0JS4HiB4MshfrdNJ6RmGDAEfWDj+BSGxyNufjWKMDqmvDkKYu0vhfpHrJh3WK7MkGd+zj/0umvUWmCGVOb1jUwt3S82mYo2qf0KvWQEVBe+cYHGmlpwh/FhE7+qMZzzJsHYrs+tx8c3u+FSfNGd0t8Twshm/o5dIuA34Jc8rck2A6HouZNkN9VKnDJS6MfRXptpvPJqdCRwOf9G/3djoLFyV/6bJzDpmY69YMPBrkZ3vsds0Z7WHMHaaZyeDXbFzgP75VyI85f9fNmSue9xDJWT16VoHRREwJF9hXXW0c4QBpajYlXALZ5AZc0TtaqywaCPD/w+B2KZl3Athcu8XGDBZ6PHieutEJ2oNvbAvwjot85xljiTORlB5aPvgft8RUnpFjNS5E+OZP91+kvYgQjn9vL4z6DAg2L995d+y4FSBVaf3nrzlj0vcBWr/59ITYtoeTlg48SEqpjHhJI8VDfTuJ6v+seLnGi0Ktc1fDLxLzIV5vKKHGFgv2vsNn0DGTgANCeoLNQmuQ3k1p0Cf/kUQADJegvvuZ8SOtGNZgbRTf24oUp9QmRHDtTlnqQ4yafg3oGc7FYMSU9ieX68acoa7l4MvWUxW5Tp4PyKj2DBIW5ZS4Qzwgm1I="
+      secure: "pypi-AgEIcHlwaS5vcmcCJDY3NmM4YjdkLWNiYzEtNDNmNC1iY2ZjLTY5ZmJkNTU3ZmQzYQACOXsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJodWNrZWxweSJdfSwgInZlcnNpb24iOiAxfQAABiDjty7gaDeUKyEX5j81tgE_H_dszdakS4m3fgy604zDZA"
 #    skip_existing: true
 #    on:
 #      branch: master
