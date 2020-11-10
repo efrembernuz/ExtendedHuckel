@@ -23,11 +23,11 @@ after_success:
 - cd ..
 deploy:
   - provider: pypi
-    distributions: sdist
-    user: efrembernuz
+#    distributions: sdist
+    user: "__token__"
     password:
-      secure: "d4ctLBW/ZzbGBjTkE/NRgRYX7PSI2TT7Aayh0fco7gAxPNrcOYQ3OgMUXvhYpWpxb6D3EvEt42r9ZpRkF28VwTiKFPVNkKMqpytGBtduNB/IB5laskUJtTyUT3M4ZKIIRLAJdo6cQffyam5hQf3mQGlYxyKEggUdOPHrkru0ko7fcB6mdVdKW5R2wQ/se6hGx8m0mm2z8RxEKXiKSI8gn6CcVeCcYUE1w6HmLWbwJ2jpNU7K3CBJGBfKJEZepcXcyF8gz7wnW0gqhuoLDw7TxJD+C4k3er/NVl8a7m/8KpLqNgMJmYdk+3wMuyiXZ8D3ymaz8EpUVLpfOBQgFKICIWiVuYquW0okRxzZjpBWta3DxSnYX7cmaqgMbZjTi8/P2twVBSgmRO6NX/Z4NeYHMtH8HaZNJGL9pO9tHaoAnSWY04r9nOldtwzn1yTFMYWRVFzrE+aMAyYGro4lUEx6pwZ9WReTo1KQo70ROUANkLwjL5hQD7KOahTC9KFg2oK9FkSO9lL5Lheay55+KDIp6MCDmCzWTYRBuRQhqykUmQ9Mfx3wWutx8ddSktu1f8yZOxY5X/NT0gd6BxhDkmXKcwrpTbVIQOsYEmcwDTY2sKbfw3g/nUBSqoCxc4L+FQabk2mmk8FDvbGRCpd/a+rVwFOpJXWBk3+SqjOnSM4g+70="
-    skip_existing: true
-    on:
-      branch: master
-      tags: false
+      secure: "pZPYlFCocYc71P9Y+APAeO8/+5NuNKK2T/BMSvFNIRpGDOIkoqM0JS4HiB4MshfrdNJ6RmGDAEfWDj+BSGxyNufjWKMDqmvDkKYu0vhfpHrJh3WK7MkGd+zj/0umvUWmCGVOb1jUwt3S82mYo2qf0KvWQEVBe+cYHGmlpwh/FhE7+qMZzzJsHYrs+tx8c3u+FSfNGd0t8Twshm/o5dIuA34Jc8rck2A6HouZNkN9VKnDJS6MfRXptpvPJqdCRwOf9G/3djoLFyV/6bJzDpmY69YMPBrkZ3vsds0Z7WHMHaaZyeDXbFzgP75VyI85f9fNmSue9xDJWT16VoHRREwJF9hXXW0c4QBpajYlXALZ5AZc0TtaqywaCPD/w+B2KZl3Athcu8XGDBZ6PHieutEJ2oNvbAvwjot85xljiTORlB5aPvgft8RUnpFjNS5E+OZP91+kvYgQjn9vL4z6DAg2L995d+y4FSBVaf3nrzlj0vcBWr/59ITYtoeTlg48SEqpjHhJI8VDfTuJ6v+seLnGi0Ktc1fDLxLzIV5vKKHGFgv2vsNn0DGTgANCeoLNQmuQ3k1p0Cf/kUQADJegvvuZ8SOtGNZgbRTf24oUp9QmRHDtTlnqQ4yafg3oGc7FYMSU9ieX68acoa7l4MvWUxW5Tp4PyKj2DBIW5ZS4Qzwgm1I="
+#    skip_existing: true
+#    on:
+#      branch: master
+#      tags: false
