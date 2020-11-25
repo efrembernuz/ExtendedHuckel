@@ -1,4 +1,4 @@
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 import os
 import copy
@@ -217,7 +217,7 @@ class ExtendedHuckel:
             for symbol in self.symbols:
                 symbol = symbol.split('_')[0]
                 self.n_electrons += tools.element_valence_electron(symbol)
-            self.n_electrons += self.charge
+            self.n_electrons -= self.charge
         return self.n_electrons
 
     def get_multiplicity(self):
