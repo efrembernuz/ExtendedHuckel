@@ -3,13 +3,14 @@ os:
 - linux
 python:
 - '2.7'
-- '3.6'
+- '3.8'
 branches:
   only:
   - master
 notifications:
   email:
-  - komuisan@gmail.com
+#  - komuisan@gmail.com
+  - abelcarreras83@gmail.com
 install:
 - pip install coverage
 - pip install coveralls
@@ -26,3 +27,6 @@ deploy:
   user: "__token__"
   password:
     secure: wNPKfmNEHGuDBcPDNrxlIm+xtso8sosIkM/yZEL7VU1VmNR7umVvWT3xvsClrajyqujmyp+GvqQ4+VfFukNjiVwL+NS4SNC7xbWbRT3yoqw3cjKql4dfnhc2Z/1kX/FbQT08RDWTkGzWFjb2pa+VpN+zvamFWCb+RkhtO/sdcjJ1wiwzCxlNmhWGUjc/4Jk/n/xMvYgx6qsjEyt9JTxKvGOBdYn0ZFYN+jozeiV89c6Fq6OOX3tYv4OQmkgA/+fjDzRJrVHioGNDgFrWmNWrbgB0BcOrARxDAGqFQy9pzW8LwwymJYnpeurNT4rtzcRro0h1w0v4PYXfx//S+oeVBQyVNJRPfWIHPjM+wInKvyeCVBuWrMohVNkcN6rU1J3adGPx6tnp0SioW1d9l6JBkzo3WSaoO/1zocOqbDefA0XXeNC4pTnykDChW2bT1mPrHhcaA7NEL1mDvAfoq+pbA7LKS20CWa6FRC1wVB9/4jyrCipZBEfmGsoVWw5yRxWDZNA4uVwP0x3HzzjHOPBM7y29wAm9W7ddyeACGilVYndxjTp/L/M6rql1T1ktdu29IJ83Dw54EeOcYcfZN43X88xiLorRO9Z60vUV5MRhIGelJue6A4WWE+x4EYCmCGwxyMXzPeCmb/518m8ok+5wNEQaaPanKYMfaJa+gELHtLU=
+    on:
+        branch: master
+        tags: False
