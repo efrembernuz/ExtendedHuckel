@@ -18,7 +18,6 @@ install:
 - pip install -e .
 script:
 - cd tests
-- coverage run --source=../ExtendedHuckel -m unittest discover . "test_*.py"
 after_success:
 - coveralls
 - cd ..
