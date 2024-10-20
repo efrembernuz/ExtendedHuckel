@@ -1,4 +1,4 @@
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 import os
 import copy
@@ -246,5 +246,5 @@ class ExtendedHuckel:
                 pure_basis = copy.deepcopy(self.basis[symbol])
                 if self.pure_orbitals and len(self.basis[symbol]) > 1:
                     pure_basis[1]['shell_type'] = 'd_'
-                self.molecular_basis['atoms'].append({'shells': pure_basis})
+                self.molecular_basis['atoms'].append({'shells': pure_basis, 'symbol': symbol})
         return self.molecular_basis

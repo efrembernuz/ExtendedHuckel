@@ -1,4 +1,4 @@
-from numpy.distutils.core import setup
+from setuptools import setup, Extension
 
 
 def get_version_number():
@@ -11,6 +11,7 @@ def get_version_number():
 setup(name='huckelpy',
       version=get_version_number(),
       description='Package to calculate the molecular orbitals with the extended huckel method',
+      long_description=open('README.md').read(),
       author='Efrem Bernuz',
       author_email='komuisan@gmail.com',
       packages=['huckelpy'],
